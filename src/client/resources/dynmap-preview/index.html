@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRT Line Draft Preview</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: #121212;
+            font-family: system-ui, sans-serif;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        #map {
+            position: absolute;
+            inset: 0;
+            top: 40px;
+        }
+        #toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            background: #222;
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            font-size: 13px;
+        }
+        #toolbar a {
+            color: #8cf;
+        }
+        #status {
+            flex: 1;
+        }
+        .error {
+            color: #f88;
+        }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <strong>Line draft preview</strong>
+        <span id="status">Loading…</span>
+        <a id="live-dynmap-link" href="#" target="_blank" rel="noopener" hidden>Open live dynmap</a>
+    </div>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="/preview/preview.js"></script>
+</body>
+</html>

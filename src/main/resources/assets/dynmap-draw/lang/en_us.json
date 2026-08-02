@@ -1,0 +1,16 @@
+{
+  "category.dynmap-draw": "Dynmap Draw",
+  "title.dynmap-draw.config": "Dynmap Draw Settings",
+  "category.dynmap-draw.drawing": "Line Drawing",
+  "option.dynmap-draw.enable_dynmap_draw_hud": "Show Dynmap line drawing HUD",
+  "option.dynmap-draw.enable_dynmap_draw_hud.tooltip": "Shows the corner count and /dl command hints while drawing Dynmap lines.",
+  "option.dynmap-draw.dynmap_export_path": "Dynmap export folder",
+  "option.dynmap-draw.dynmap_export_path.tooltip": "Folder for pending_marker_*.json exports in dynmap marker format (sets/lines). Leave empty for .minecraft/config/dynmap-draw/exports. Relative paths are resolved from the game directory.",
+  "option.dynmap-draw.dynmap_corner_from_crosshair": "Place corners at crosshair",
+  "option.dynmap-draw.dynmap_corner_from_crosshair.tooltip": "When on, attack/use and /dl addcorner use the block or entity your crosshair is pointing at. When off, they use your player position. If nothing is targeted, your position is used.",
+  "hud.dynmap-draw.dynmap_corner_source.crosshair": "Corner source: crosshair",
+  "hud.dynmap-draw.dynmap_corner_source.player": "Corner source: player position",
+  "option.dynmap-draw.dynmap_preview_url": "Dynmap tile base URL",
+  "option.dynmap-draw.dynmap_preview_url.tooltip": "Base URL for dynmap tiles and configuration used by the local preview (e.g. https://dynmap.minecartrapidtransit.net/main/).",
+  "button.dynmap-draw.dynmap_review": "Open Dynmap line drafts..."
+}

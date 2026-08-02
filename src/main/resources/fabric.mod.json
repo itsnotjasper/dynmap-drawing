@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "dynmap-draw",
+  "version": "${version}",
+  "name": "Dynmap Draw",
+  "description": "Client-side Dynmap road line drawing with local map preview (/dl).",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "mixins": [
+    "dynmap-draw.mixins.json"
+  ],
+  "entrypoints": {
+    "client": [
+      "com.itsnotjasper.client.DynmapDrawClient"
+    ],
+    "modmenu": [
+      "com.itsnotjasper.dynmapdraw.client.integration.DynmapDrawModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "fabric-api": "*",
+    "minecraft": "1.21.11",
+    "cloth-config": ">=21.11"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
