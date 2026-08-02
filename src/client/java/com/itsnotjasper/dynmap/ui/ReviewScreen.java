@@ -2,7 +2,9 @@ package com.itsnotjasper.dynmap.ui;
 
 import com.itsnotjasper.dynmap.DynmapServices;
 import com.itsnotjasper.dynmap.export.DynmapExporter;
-import com.itsnotjasper.dynmap.model.Corner;
+import com.itsnotjasper.dynmap.importer.ImportOptions;
+import com.itsnotjasper.dynmap.importer.ImportResult;
+import com.itsnotjasper.dynmap.importer.ImportService;
 import com.itsnotjasper.dynmap.model.LineDraft;
 import com.itsnotjasper.dynmap.preview.DynmapBrowserPreview;
 import com.itsnotjasper.dynmap.preview.DynmapPreviewCollector;
@@ -14,9 +16,12 @@ import net.minecraft.network.chat.Component;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class ReviewScreen extends Screen {
     private final Screen parent;
@@ -46,22 +51,25 @@ public final class ReviewScreen extends Screen {
 
         int buttonY = height - 28;
         addRenderableWidget(Button.builder(Component.literal("Toggle visibility"), button -> toggleSelected())
-                .bounds(12, buttonY, 120, 20)
+                .bounds(12, buttonY, 100, 20)
                 .build());
         addRenderableWidget(Button.builder(Component.literal("Load corners"), button -> loadSelected())
-                .bounds(140, buttonY, 120, 20)
+                .bounds(118, buttonY, 100, 20)
                 .build());
         addRenderableWidget(Button.builder(Component.literal("Delete"), button -> deleteSelected())
-                .bounds(268, buttonY, 80, 20)
+                .bounds(224, buttonY, 60, 20)
+                .build());
+        addRenderableWidget(Button.builder(Component.literal("Import"), button -> importDrafts())
+                .bounds(290, buttonY, 60, 20)
                 .build());
         addRenderableWidget(Button.builder(Component.literal("Export all"), button -> exportAll())
-                .bounds(356, buttonY, 100, 20)
+                .bounds(356, buttonY, 85, 20)
                 .build());
         addRenderableWidget(Button.builder(Component.literal("Preview"), button -> previewDrafts())
-                .bounds(464, buttonY, 80, 20)
+                .bounds(445, buttonY, 70, 20)
                 .build());
         addRenderableWidget(Button.builder(Component.literal("Done"), button -> onClose())
-                .bounds(width - 92, buttonY, 80, 20)
+                .bounds(width - 82, buttonY, 70, 20)
                 .build());
     }
 
@@ -70,7 +78,7 @@ public final class ReviewScreen extends Screen {
         super.render(graphics, mouseX, mouseY, partialTick);
         graphics.drawCenteredString(font, title, width / 2, 10, 0xFFFFFF);
         if (drafts.isEmpty()) {
-            graphics.drawCenteredString(font, "No saved drafts yet. Use /dl addline to create one.", width / 2, 48, 0xAAAAAA);
+            graphics.drawCenteredString(font, "No saved drafts yet. Use /dl addline or Import.", width / 2, 48, 0xAAAAAA);
         } else if (selectedIndex >= 0 && selectedIndex < drafts.size()) {
             LineDraft draft = drafts.get(selectedIndex);
             graphics.drawString(font, detailLine(draft), 12, height - 52, 0xCCCCCC, false);
@@ -138,6 +146,54 @@ public final class ReviewScreen extends Screen {
             );
         }
         DynmapBrowserPreview.launch(toPreview);
+    }
+
+    private void importDrafts() {
+        var player = minecraft.player;
+        if (player == null) {
+            return;
+        }
+        minecraft.setScreen(new ImportPathScreen(this, player.getGameProfile().name()));
+    }
+
+    void finishImport(Path path, String author) {
+        if (path == null) {
+            return;
+        }
+        var player = minecraft.player;
+        if (player == null) {
+            return;
+        }
+
+        Set<String> existingLineIds = new HashSet<>();
+        for (LineDraft draft : DynmapServices.holder().drafts().drafts()) {
+            if (draft.line != null && draft.line.lineId != null) {
+                existingLineIds.add(draft.line.lineId);
+            }
+        }
+
+        ImportOptions options = ImportOptions.fromConfig(author);
+        ImportResult result = ImportService.importFile(path, options, existingLineIds);
+        if (result.hasError()) {
+            player.displayClientMessage(Component.literal("Import failed: " + result.errorMessage()), false);
+            return;
+        }
+        if (result.importedCount() == 0) {
+            player.displayClientMessage(Component.literal(
+                    "No lines imported from " + path.getFileName() + " (skipped " + result.skippedCount() + ")"
+            ), false);
+            return;
+        }
+
+        var draftManager = DynmapServices.holder().drafts();
+        for (LineDraft draft : result.drafts()) {
+            draftManager.addDraft(draft);
+        }
+        player.displayClientMessage(Component.literal(
+                "Imported " + result.importedCount() + " line(s) from " + path.getFileName()
+                        + " (skipped " + result.skippedCount() + ")"
+        ), false);
+        rebuild();
     }
 
     private void exportAll() {
